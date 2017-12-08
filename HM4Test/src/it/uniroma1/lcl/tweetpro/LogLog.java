@@ -37,7 +37,6 @@ public class LogLog implements UniqueUsersCount {
             multi[j] = Integer.max(multi[j], binUser.substring(binUser.lastIndexOf("1")).length());
         }
         Double sol = array[k]* Math.pow(2, (double) multisetToList(multi).stream().reduce((a, b) -> a + b).get() * 1 / m);
-        System.out.println(Math.abs(6592.0 - sol) / 6592.0);
         return sol.intValue();
     }
 

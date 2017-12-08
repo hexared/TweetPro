@@ -30,7 +30,6 @@ public class CountMin implements TopHashtags{
     private final int[] primesList = {2, 3, 5, 7, 11, 13}; // array of primes numbers used in the hash function
     private final int d = primesList.length;  // # of rows equal to the possible hash functions
     private int w; // # of columns
-    private List<String> hashtagsList;
     private int k;
 
     /**
@@ -44,8 +43,8 @@ public class CountMin implements TopHashtags{
     public List<String> calculate(List<String> hashtagsList, int k)
     {   
         this.k=k;
-        this.hashtagsList = hashtagsList;
         this.w= (int) (2*hashtagsList.size())/k;
+        if(hashtagsList.size()<=0){return null;}
         return countMin(hashtagsList);
     }
 

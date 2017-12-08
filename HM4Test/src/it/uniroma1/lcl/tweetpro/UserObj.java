@@ -28,7 +28,7 @@ public class UserObj implements User {
 	 */
 	public UserObj(String userInfo) throws StringIndexOutOfBoundsException {
 		try {
-			this.userInfo = Arrays.asList(userInfo.replace(",\"", "%sep%\"").split("%sep%"));
+			this.userInfo = Arrays.asList(userInfo.split("%sep%"));
 		this.name = this.userInfo.stream().filter(x -> x.contains("\"name\":")).findFirst()
 				.map(x -> x.substring(x.indexOf(":\"") + 2, x.length() - 1)).get();
 		this.screenName = this.userInfo.stream().filter(x -> x.contains("\"screen_name\":")).findFirst()

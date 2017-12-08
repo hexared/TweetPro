@@ -18,16 +18,16 @@ public class TweetObj implements Tweet {
     private int rtCount;
 
     public TweetObj(String tweet) {
-        this.tweet = tweet;
-        this.userInfo = tweet.substring(tweet.indexOf("\"user\":"), tweet.indexOf(",\"geo\":"));
+        this.tweet = tweet.replace(",\"", "%sep%\"");
+        this.userInfo = this.tweet.substring(this.tweet.indexOf("\"user\":"), this.tweet.indexOf("%sep%\"geo\":"));
         this.origTweetInfo = tweet.contains("\"retweeted_status\":")
                 ? tweet.substring(tweet.indexOf("\"retweeted_status\":"), tweet.indexOf("},\"retweet_count\":") + 1)
                 : "";
-        this.id = Arrays.asList(this.tweet.split(",")).stream().filter(x -> x.contains("\"id_str\":")).findFirst()
+        this.id = Arrays.asList(this.tweet.split("%sep%")).stream().filter(x -> x.contains("\"id_str\":")).findFirst()
                 .map(x -> x.substring(x.indexOf(":\"") + 2, x.length() - 1)).map(Long::parseLong).get();
-        this.likeCount = Arrays.asList(this.tweet.split(",")).stream().filter(x -> x.contains("\"favorite_count\":"))
+        this.likeCount = Arrays.asList(this.tweet.split("%sep%")).stream().filter(x -> x.contains("\"favorite_count\":"))
                 .findFirst().map(x -> x.substring(x.indexOf(":") + 1, x.length())).map(Integer::parseInt).get();
-        this.rtCount = Arrays.asList(this.tweet.split(",")).stream().filter(x -> x.contains("\"retweet_count\":"))
+        this.rtCount = Arrays.asList(this.tweet.split("%sep%")).stream().filter(x -> x.contains("\"retweet_count\":"))
                 .findFirst().map(x -> x.substring(x.indexOf(":") + 1, x.length())).map(Integer::parseInt).get();
     }
 
@@ -40,15 +40,15 @@ public class TweetObj implements Tweet {
     }
 
     public String getText() {
-        return Arrays.asList(tweet.split(",")).stream().filter(x -> x.contains("\"text\":")).findFirst()
+        return Arrays.asList(tweet.split("%sep%")).stream().filter(x -> x.contains("\"text\":")).findFirst()
                 .map(x -> x.substring(x.indexOf(":\"") + 2, x.length() - 1)).get();
     }
 
     public List<String> getHashtags() {
         List<String> hashtags = Arrays.asList(
-                tweet.substring(tweet.lastIndexOf("\"hashtags\":[") + 12, tweet.lastIndexOf("],\"symbols\"")).split("\\},\\{"));
+                tweet.substring(tweet.lastIndexOf("\"hashtags\":[") + 12, tweet.lastIndexOf("]%sep%\"symbols\"")).split("\\},\\{"));
         return hashtags.stream().filter(h -> !h.equals(""))
-                .map(h -> h.substring(h.indexOf("\"text\":") + 8, h.indexOf(",\"indices\"") - 1).replace("#", ""))
+                .map(h -> h.substring(h.indexOf("\"text\":") + 8, h.indexOf("%sep%\"indices\"") - 1))
                 .collect(Collectors.toList());
     }
 
@@ -69,13 +69,13 @@ public class TweetObj implements Tweet {
             return new TweetObj(origTweetInfo);
         }
         System.out.println("This is not a retweet.");
-        return this;
+        return null;
     }
 
     public Optional<URL> getMedia() {
         Optional<URL> OptMediaURL = Optional.empty();
         try {
-            String media = Arrays.asList(tweet.split(",")).stream().filter(x -> x.contains("\"media_url\":"))
+            String media = Arrays.asList(tweet.split("%sep%")).stream().filter(x -> x.contains("\"media_url\":"))
                     .findFirst().map(x -> x.substring(x.indexOf(":") + 2, x.length() - 1).replace("\\", "")).get();
             URL mediaURL = new URL(media);
             OptMediaURL = Optional.of(mediaURL);
