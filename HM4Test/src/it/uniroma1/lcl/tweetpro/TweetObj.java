@@ -18,15 +18,19 @@ public class TweetObj implements Tweet {
     private int rtCount;
 
     public TweetObj(String tweet) {
+        
         this.tweet = tweet.replace(",\"", "%sep%\"");
         this.userInfo = this.tweet.substring(this.tweet.indexOf("\"user\":"), this.tweet.indexOf("%sep%\"geo\":"));
+
         this.origTweetInfo = tweet.contains("\"retweeted_status\":")
-                ? tweet.substring(tweet.indexOf("\"retweeted_status\":"), tweet.indexOf("},\"retweet_count\":") + 1)
-                : "";
+                ? tweet.substring(tweet.indexOf("\"retweeted_status\":"), tweet.indexOf("},\"retweet_count\":") + 1) : "";
+
         this.id = Arrays.asList(this.tweet.split("%sep%")).stream().filter(x -> x.contains("\"id_str\":")).findFirst()
                 .map(x -> x.substring(x.indexOf(":\"") + 2, x.length() - 1)).map(Long::parseLong).get();
+
         this.likeCount = Arrays.asList(this.tweet.split("%sep%")).stream().filter(x -> x.contains("\"favorite_count\":"))
                 .findFirst().map(x -> x.substring(x.indexOf(":") + 1, x.length())).map(Integer::parseInt).get();
+                
         this.rtCount = Arrays.asList(this.tweet.split("%sep%")).stream().filter(x -> x.contains("\"retweet_count\":"))
                 .findFirst().map(x -> x.substring(x.indexOf(":") + 1, x.length())).map(Integer::parseInt).get();
     }
@@ -45,8 +49,8 @@ public class TweetObj implements Tweet {
     }
 
     public List<String> getHashtags() {
-        List<String> hashtags = Arrays.asList(
-                tweet.substring(tweet.lastIndexOf("\"hashtags\":[") + 12, tweet.lastIndexOf("]%sep%\"symbols\"")).split("\\},\\{"));
+        List<String> hashtags = Arrays.asList(tweet.substring(tweet.lastIndexOf("\"hashtags\":[") + 12, tweet.lastIndexOf("]%sep%\"symbols\""))
+                                        .split("\\},\\{"));
         return hashtags.stream().filter(h -> !h.equals(""))
                 .map(h -> h.substring(h.indexOf("\"text\":") + 8, h.indexOf("%sep%\"indices\"") - 1))
                 .collect(Collectors.toList());
@@ -73,17 +77,18 @@ public class TweetObj implements Tweet {
     }
 
     public Optional<URL> getMedia() {
-        Optional<URL> OptMediaURL = Optional.empty();
         try {
             String media = Arrays.asList(tweet.split("%sep%")).stream().filter(x -> x.contains("\"media_url\":"))
                     .findFirst().map(x -> x.substring(x.indexOf(":") + 2, x.length() - 1).replace("\\", "")).get();
-            URL mediaURL = new URL(media);
-            OptMediaURL = Optional.of(mediaURL);
+
+            return Optional.of(new URL(media));
+
         } catch (NoSuchElementException e) {
             System.out.println("This Tweet has no media.");
+            return null;
         } catch (MalformedURLException e) {
             System.out.println("Bad URL.");
+            return null;
         }
-        return OptMediaURL;
     }
 }

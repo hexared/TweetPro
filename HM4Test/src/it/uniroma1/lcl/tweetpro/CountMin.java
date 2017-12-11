@@ -45,6 +45,9 @@ public class CountMin implements TopHashtags{
         this.k=k;
         this.w= (int) (2*hashtagsList.size())/k;
         if(hashtagsList.size()<=0){return null;}
+        else if(hashtagsList.size() <= k){
+            System.out.println("there is/are only "+hashtagsList.size()+" hashtags: \n");
+            return hashtagsList;}
         return countMin(hashtagsList);
     }
 
